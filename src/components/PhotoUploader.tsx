@@ -83,7 +83,7 @@ export function PhotoUploader({ onPhotoLoaded, currentPhoto, zoom = 1 }: PhotoUp
         type="button"
         onClick={handleClick}
         disabled={loading}
-        className="w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a5a52] focus-visible:ring-offset-2"
+        className="w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a5a52] focus-visible:ring-offset-2 photo-upload-button"
         style={{
           background: hasPhoto ? 'transparent' : 'rgba(31,77,58,0.08)',
           border: '2px dashed rgba(31,77,58,0.3)',
@@ -93,6 +93,14 @@ export function PhotoUploader({ onPhotoLoaded, currentPhoto, zoom = 1 }: PhotoUp
           transition: 'all 0.2s ease',
         }}
       >
+        <style>{`
+          @media (max-width: 768px) {
+            .photo-upload-button {
+              height: 45px !important;
+            }
+          }
+        `}</style>
+      
         {loading ? (
           <div className="flex flex-col items-center justify-center p-2">
             <div 
@@ -113,7 +121,7 @@ export function PhotoUploader({ onPhotoLoaded, currentPhoto, zoom = 1 }: PhotoUp
             <img
               src={preview || currentPhoto?.src}
               alt="Uploaded photo preview"
-              className="h-full w-full"
+              className="h-full w-full mobile-photo-preview"
               style={{
                 height: '120px',
                 borderRadius: '2px',
@@ -123,6 +131,13 @@ export function PhotoUploader({ onPhotoLoaded, currentPhoto, zoom = 1 }: PhotoUp
                 objectFit: 'contain',
               }}
             />
+            <style>{`
+              @media (max-width: 768px) {
+                .mobile-photo-preview {
+                  height: 45px !important;
+                }
+              }
+            `}</style>
             <div 
               className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity hover:opacity-100"
               style={{
@@ -135,26 +150,46 @@ export function PhotoUploader({ onPhotoLoaded, currentPhoto, zoom = 1 }: PhotoUp
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center p-2">
+          <div className="flex flex-col items-center justify-center p-2 mobile-upload-content">
             <svg
               width="32"
               height="32"
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              className="mb-1"
+              className="mb-1 mobile-upload-icon"
             >
               <rect x="2" y="4" width="20" height="16" rx="2" stroke="#1f4d3a" strokeWidth="1.5" strokeOpacity="0.4" />
               <circle cx="8" cy="9" r="2" fill="#1f4d3a" fillOpacity="0.3" />
               <path d="M2 15L7 10L12 15" stroke="#1f4d3a" strokeWidth="1.5" strokeOpacity="0.4" strokeLinecap="round" strokeLinejoin="round" />
               <path d="M12 13L15 10L22 17" stroke="#1f4d3a" strokeWidth="1.5" strokeOpacity="0.4" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <p className="font-body text-xs font-medium text-[#14342a]">
+            <p className="font-body text-xs font-medium text-[#14342a] mobile-upload-text">
               Upload photo
             </p>
-            <p className="font-body text-xs text-[#8a9a6a]" style={{ fontSize: '10px' }}>
+            <p className="font-body text-xs text-[#8a9a6a] mobile-upload-subtext" style={{ fontSize: '10px' }}>
               JPG, PNG, HEIC
             </p>
+            <style>{`
+              @media (max-width: 768px) {
+                .mobile-upload-content {
+                  padding: 0.25rem !important;
+                }
+                .mobile-upload-icon {
+                  width: 16px !important;
+                  height: 16px !important;
+                  margin-bottom: 0.125rem !important;
+                }
+                .mobile-upload-text {
+                  font-size: 9px !important;
+                  line-height: 1.2 !important;
+                }
+                .mobile-upload-subtext {
+                  font-size: 7px !important;
+                  line-height: 1.2 !important;
+                }
+              }
+            `}</style>
           </div>
         )}
       </button>

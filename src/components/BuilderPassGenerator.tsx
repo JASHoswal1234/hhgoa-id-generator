@@ -47,32 +47,6 @@ export function BuilderPassGenerator() {
     }
   }
 
-  const handleDownload = async () => {
-    if (!generatedCanvas) return
-
-    try {
-      await downloadCanvas(generatedCanvas, 'hh-goa-builder-pass.png')
-    } catch (err) {
-      console.error('Download error:', err)
-      setError('Failed to download. Please try again.')
-    }
-  }
-
-  const handleShareToX = () => {
-    const text = encodeURIComponent('Made it to Goa. Built something worth staying for.\n\n#FrameInGoa')
-    const url = `https://twitter.com/intent/tweet?text=${text}`
-    window.open(url, '_blank', 'noopener,noreferrer')
-  }
-
-  const handleReset = () => {
-    setGeneratedCanvas(null)
-    setPhoto(null)
-    setName('')
-    setRole('')
-    setError(null)
-    setPhotoZoom(1)
-  }
-
   // Show generated result - FILLS THE ENTIRE WINDOW APERTURE
   if (generatedCanvas) {
     return (
@@ -103,11 +77,49 @@ export function BuilderPassGenerator() {
 
   // Show form - COMPACT, NO INTERNAL SCROLL, FITS IN APERTURE
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center px-6">
-      <div className="w-full space-y-2" style={{ maxWidth: '300px' }}>
+    <div className="flex h-full w-full flex-col items-center justify-start px-6 mobile-form-container" style={{ paddingTop: '20px' }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .mobile-form-container {
+            padding-top: 4px !important;
+          }
+          .mobile-form-spacing {
+            gap: 0.125rem !important;
+          }
+          .mobile-input-field {
+            min-height: 14px !important;
+            height: 14px !important;
+            font-size: 10px !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+            line-height: 14px !important;
+          }
+          .mobile-generate-btn {
+            min-height: 12px !important;
+            height: 12px !important;
+            margin-top: 1px !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+            font-size: 9px !important;
+            line-height: 12px !important;
+          }
+          .mobile-label {
+            margin-bottom: 0.125rem !important;
+            font-size: 8px !important;
+          }
+          .mobile-zoom-section {
+            margin-top: 0.125rem !important;
+          }
+        }
+      `}</style>
+      <div className="w-full space-y-2 mobile-form-spacing" style={{ maxWidth: '300px' }}>
         {/* Photo Upload - EXTRA COMPACT */}
         <div>
-          <label className="mb-1 block font-body text-xs font-medium text-[#14342a]">
+          <label className="mb-1 mobile-label block font-body text-xs font-medium text-[#14342a]">
             Your Photo
           </label>
           <PhotoUploader 
@@ -116,8 +128,8 @@ export function BuilderPassGenerator() {
             zoom={photoZoom}
           />
           {photo && (
-            <div className="mt-2">
-              <label className="mb-1 block font-body text-xs font-medium text-[#14342a]">
+            <div className="mt-2 mobile-zoom-section">
+              <label className="mb-1 mobile-label block font-body text-xs font-medium text-[#14342a]">
                 Zoom
               </label>
               <input
@@ -138,7 +150,7 @@ export function BuilderPassGenerator() {
 
         {/* Name */}
         <div>
-          <label htmlFor="name" className="mb-1 block font-body text-xs font-medium text-[#14342a]">
+          <label htmlFor="name" className="mb-1 mobile-label block font-body text-xs font-medium text-[#14342a]">
             Name
           </label>
           <input
@@ -149,7 +161,7 @@ export function BuilderPassGenerator() {
             placeholder="Enter your name"
             maxLength={50}
             required
-            className="w-full rounded-sm border px-3 py-2 font-body text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a5a52]"
+            className="w-full rounded-sm border px-3 py-2 font-body text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a5a52] mobile-input-field"
             style={{
               background: '#fff',
               border: '1.5px solid rgba(31,77,58,0.25)',
@@ -161,7 +173,7 @@ export function BuilderPassGenerator() {
 
         {/* Role */}
         <div>
-          <label htmlFor="role" className="mb-1 block font-body text-xs font-medium text-[#14342a]">
+          <label htmlFor="role" className="mb-1 mobile-label block font-body text-xs font-medium text-[#14342a]">
             Role
           </label>
           <input
@@ -172,7 +184,7 @@ export function BuilderPassGenerator() {
             placeholder="e.g. Founder, Developer"
             maxLength={50}
             required
-            className="w-full rounded-sm border px-3 py-2 font-body text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a5a52]"
+            className="w-full rounded-sm border px-3 py-2 font-body text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a5a52] mobile-input-field"
             style={{
               background: '#fff',
               border: '1.5px solid rgba(31,77,58,0.25)',
@@ -186,7 +198,7 @@ export function BuilderPassGenerator() {
         <button
           onClick={handleGenerate}
           disabled={!canGenerate || generating}
-          className="w-full rounded-sm px-4 py-2 font-body text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a5a52] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-sm px-4 py-2 font-body text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a5a52] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mobile-generate-btn"
           style={{
             background: canGenerate ? '#FEE101' : 'rgba(254,225,1,0.3)',
             color: '#1a3a2e',

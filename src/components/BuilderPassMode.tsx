@@ -245,7 +245,7 @@ export function BuilderPassActions({
 
   return (
     <div 
-      className="flex flex-col items-center gap-2"
+      className="flex flex-col items-center gap-2 mobile-action-buttons"
       style={{
         width: '100%',
         maxWidth: '600px',
@@ -253,10 +253,28 @@ export function BuilderPassActions({
         paddingTop: 'clamp(16px, 2.5vh, 24px)',
       }}
     >
+      <style>{`
+        @media (max-width: 768px) {
+          .mobile-action-buttons {
+            padding-top: 8px !important;
+          }
+          .mobile-action-buttons .mobile-main-button {
+            min-height: 36px !important;
+            padding: 8px 12px !important;
+            font-size: 12px !important;
+            min-width: 120px !important;
+          }
+          .mobile-action-buttons .mobile-reset-button {
+            min-height: 28px !important;
+            padding: 6px 10px !important;
+            font-size: 11px !important;
+          }
+        }
+      `}</style>
       <div className="flex w-full flex-wrap items-center justify-center gap-2">
         <button
           onClick={onDownload}
-          className="rounded-sm px-5 py-2.5 font-body text-sm font-medium text-white transition-colors hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF0080] focus-visible:ring-offset-2"
+          className="rounded-sm px-5 py-2.5 font-body text-sm font-medium text-white transition-colors hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF0080] focus-visible:ring-offset-2 mobile-main-button"
           style={{
             background: '#FF0080',
             minHeight: '44px',
@@ -269,7 +287,7 @@ export function BuilderPassActions({
 
         <button
           onClick={onShare}
-          className="rounded-sm px-5 py-2.5 font-body text-sm font-medium text-white transition-colors hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+          className="rounded-sm px-5 py-2.5 font-body text-sm font-medium text-white transition-colors hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 mobile-main-button"
           style={{
             background: '#000000',
             minHeight: '44px',
@@ -283,7 +301,7 @@ export function BuilderPassActions({
 
       <button
         onClick={onReset}
-        className="rounded-sm px-4 py-2 font-body text-xs transition-colors hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f7f1e3] focus-visible:ring-offset-2"
+        className="rounded-sm px-4 py-2 font-body text-xs transition-colors hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f7f1e3] focus-visible:ring-offset-2 mobile-reset-button"
         style={{
           color: 'rgba(247,241,227,0.7)',
           minHeight: '36px',

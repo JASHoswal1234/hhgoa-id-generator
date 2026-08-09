@@ -16,6 +16,10 @@ import postageSrc from '../assets/illustrations/travel/paradise-postage-stamp.pn
  * - Postage stamp small accent on wall
  * - Scooter scaled down, grounded at bottom
  * 
+ * RESPONSIVE:
+ * - Desktop (>768px): Current positioning
+ * - Mobile (≤768px): Repositioned near window, no huge gaps
+ * 
  * HIERARCHY: Window dominates, objects support
  */
 export function EnvironmentalObjects() {
@@ -23,7 +27,7 @@ export function EnvironmentalObjects() {
     <>
       {/* Camera - ON THE SILL (moved up and smaller) */}
       <div
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute mobile-camera"
         style={{
           // Positioned higher up, smaller
           left: '50%',
@@ -33,6 +37,17 @@ export function EnvironmentalObjects() {
           zIndex: 35,
         }}
       >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-camera {
+              left: 30px !important;
+              bottom: auto !important;
+              top: 400px !important;
+              transform: none !important;
+              width: 85px !important;
+            }
+          }
+        `}</style>
         <div style={{ transform: 'rotate(-8deg)' }}>
           <img
             src={cameraSrc}
@@ -60,7 +75,7 @@ export function EnvironmentalObjects() {
 
       {/* Passport - BESIDE window (NOT covering shutter) */}
       <div
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute mobile-passport"
         style={{
           // Moved away from window center, smaller, supporting role
           left: '50%',
@@ -70,6 +85,18 @@ export function EnvironmentalObjects() {
           zIndex: 32,
         }}
       >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-passport {
+              right: 30px !important;
+              left: auto !important;
+              bottom: auto !important;
+              top: 360px !important;
+              transform: none !important;
+              width: 90px !important;
+            }
+          }
+        `}</style>
         <div style={{ transform: 'rotate(11deg)' }}>
           <img
             src={passportSrc}
@@ -93,7 +120,7 @@ export function EnvironmentalObjects() {
 
       {/* Fish Tile - ARCHITECTURAL element on wall beside window */}
       <div
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute mobile-fish-tile"
         style={{
           // Wall placement, near but not touching window
           left: '50%',
@@ -103,6 +130,17 @@ export function EnvironmentalObjects() {
           zIndex: 26,
         }}
       >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-fish-tile {
+              right: 25px !important;
+              left: auto !important;
+              top: 250px !important;
+              transform: none !important;
+              width: 70px !important;
+            }
+          }
+        `}</style>
         {/* Mortar joint - embedded in wall */}
         <div
           className="absolute"
@@ -131,7 +169,7 @@ export function EnvironmentalObjects() {
 
       {/* Postage Stamp - ON WINDOW FRAME (upper right area) */}
       <div
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute mobile-postage"
         style={{
           // Positioned on the window frame
           left: '50%',
@@ -141,6 +179,17 @@ export function EnvironmentalObjects() {
           zIndex: 33,
         }}
       >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-postage {
+              right: 20px !important;
+              left: auto !important;
+              top: 120px !important;
+              transform: none !important;
+              width: 65px !important;
+            }
+          }
+        `}</style>
         <div style={{ transform: 'rotate(-14deg)' }}>
           <img
             src={postageSrc}
@@ -164,7 +213,7 @@ export function EnvironmentalObjects() {
 
       {/* Scooter - GROUNDED at bottom edge */}
       <div
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute mobile-scooter"
         style={{
           // Touch bottom screen edge
           left: 'clamp(-30px, -6vw, -15px)',
@@ -173,6 +222,15 @@ export function EnvironmentalObjects() {
           zIndex: 50,
         }}
       >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-scooter {
+              left: -20px !important;
+              bottom: 10px !important;
+              width: 200px !important;
+            }
+          }
+        `}</style>
         <div style={{ transform: 'rotate(-3deg)' }}>
           <SceneImage asset={scooter} width="100%" still />
           {/* Ground shadow - grounded */}

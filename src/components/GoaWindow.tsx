@@ -35,7 +35,7 @@ export function GoaWindow({ mode }: GoaWindowProps) {
   return (
     <>
       <div
-        className="absolute"
+        className="absolute mobile-window"
         style={{
           left: '50%',
           top: 'clamp(200px, 28vh, 280px)',
@@ -47,6 +47,15 @@ export function GoaWindow({ mode }: GoaWindowProps) {
           zIndex: 30,
         }}
       >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-window {
+              top: 170px !important;
+              width: 92vw !important;
+              max-width: 440px !important;
+            }
+          }
+        `}</style>
         {/* Aperture - sits BEHIND the window frame */}
         <div
           className="absolute"
@@ -189,7 +198,7 @@ export function GoaWindow({ mode }: GoaWindowProps) {
       {/* Action Buttons - rendered BELOW the window frame */}
       {generatedCanvas && actionHandlers && (
         <div
-          className="absolute"
+          className="absolute mobile-actions"
           style={{
             left: '50%',
             top: 'clamp(740px, 97vh, 920px)',
@@ -199,6 +208,15 @@ export function GoaWindow({ mode }: GoaWindowProps) {
             zIndex: 30,
           }}
         >
+          <style>{`
+            @media (max-width: 768px) {
+              .mobile-actions {
+                top: 480px !important;
+                width: 92vw !important;
+                max-width: 440px !important;
+              }
+            }
+          `}</style>
           <BuilderPassActions
             generatedCanvas={generatedCanvas}
             onDownload={actionHandlers.onDownload}

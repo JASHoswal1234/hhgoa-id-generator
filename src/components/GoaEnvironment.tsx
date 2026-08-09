@@ -25,7 +25,9 @@ import goaHindiSrc from '../assets/logo/goa_hindi.svg'
  * - 5-8 curated objects with physical relationships to window/wall
  * - Three depth layers: background → architecture → foreground
  * 
- * Mobile-first: 375px is PRIMARY reference viewport
+ * RESPONSIVE DESIGN:
+ * - Desktop (>768px): Current positioning preserved
+ * - Mobile (≤768px): Recomposed vertical scene with window as anchor
  * 
  * The window contains the generators. Mode switches INSIDE the aperture.
  * This is ONE scene, not multiple sections.
@@ -37,12 +39,25 @@ export function GoaEnvironment() {
     <section
       className="hh-grain relative w-full overflow-hidden"
       style={{
-        // INCREASED HEIGHT - allow space for window, buttons, breathing room, and waves
+        // RESPONSIVE HEIGHT
+        // Desktop: 140dvh for full scene
+        // Mobile: auto-height based on content flow
         minHeight: '140dvh',
         backgroundColor: '#1a3a2e',
       }}
       aria-label="Hacker House Goa"
     >
+      {/* Mobile-specific COMPACT height */}
+      <style>{`
+        @media (max-width: 768px) {
+          section[aria-label="Hacker House Goa"] {
+            min-height: 100vh !important;
+            max-height: none !important;
+            padding-bottom: 0 !important;
+          }
+        }
+      `}</style>
+
       {/* LAYER 1: Environmental Base - Forest Green Wall */}
       <div className="absolute inset-0">
         {/* Base wall */}
@@ -87,13 +102,22 @@ export function GoaEnvironment() {
       
       {/* 2:47 PM Studio - TOP LEFT */}
       <div
-        className="pointer-events-none absolute z-20"
+        className="pointer-events-none absolute z-20 mobile-logo-247"
         style={{
           left: 'clamp(20px, 5vw, 40px)',
           top: 'clamp(20px, 4vh, 35px)',
           width: 'clamp(70px, 15vw, 110px)',
         }}
       >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-logo-247 {
+              left: 15px !important;
+              top: 20px !important;
+              width: 60px !important;
+            }
+          }
+        `}</style>
         <img
           src={studio247Src}
           alt="2:47 PM Studio"
@@ -105,7 +129,7 @@ export function GoaEnvironment() {
 
       {/* Hacker House Goa - CENTERED TOP (Primary Brand) */}
       <div
-        className="pointer-events-none absolute z-20"
+        className="pointer-events-none absolute z-20 mobile-logo-hhgoa"
         style={{
           left: '50%',
           top: 'clamp(25px, 5vh, 45px)',
@@ -113,6 +137,14 @@ export function GoaEnvironment() {
           width: 'clamp(200px, 45vw, 380px)',
         }}
       >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-logo-hhgoa {
+              top: 18px !important;
+              width: 200px !important;
+            }
+          }
+        `}</style>
         <div className="relative">
           {/* Main Hacker House Goa logo */}
           <img
@@ -149,7 +181,7 @@ export function GoaEnvironment() {
       
       {/* Sun - atmospheric background (upper right) */}
       <div
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute mobile-sun"
         style={{
           right: 'clamp(40px, 8vw, 100px)',
           top: 'clamp(30px, 5vh, 60px)',
@@ -158,12 +190,21 @@ export function GoaEnvironment() {
           zIndex: 8,
         }}
       >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-sun {
+              right: 15px !important;
+              top: 20px !important;
+              width: 65px !important;
+            }
+          }
+        `}</style>
         <img src={sunSrc} alt="" className="w-full" loading="lazy" draggable={false} />
       </div>
 
       {/* Palm Tall - DOMINANT tree (LEFT, GROUNDED - trunk enters from bottom) */}
       <div
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute mobile-palm-tall-left"
         style={{
           left: 'clamp(-60px, -12vw, -40px)',
           bottom: 'clamp(-80px, -14vh, -50px)',
@@ -172,12 +213,22 @@ export function GoaEnvironment() {
           zIndex: 11,
         }}
       >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-palm-tall-left {
+              left: -80px !important;
+              bottom: 0 !important;
+              width: 260px !important;
+              opacity: 0.45 !important;
+            }
+          }
+        `}</style>
         <SceneImage asset={palmTall} width="100%" still />
       </div>
 
       {/* Palm Short - Right side, prominent and visible */}
       <div
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute mobile-palm-short-right"
         style={{
           right: 'clamp(-20px, -4vw, -10px)',
           bottom: 'clamp(-100px, -18vh, -70px)',
@@ -186,12 +237,22 @@ export function GoaEnvironment() {
           zIndex: 10,
         }}
       >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-palm-short-right {
+              right: -90px !important;
+              bottom: 0 !important;
+              width: 280px !important;
+              opacity: 0.70 !important;
+            }
+          }
+        `}</style>
         <img src={palmShortSrc} alt="" className="w-full" loading="lazy" draggable={false} />
       </div>
 
       {/* Palm Tall - BEHIND scooter (left side, filling empty space) */}
       <div
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute mobile-palm-tall-back"
         style={{
           left: 'clamp(-80px, -16vw, -60px)',
           bottom: 'clamp(-100px, -16vh, -70px)',
@@ -200,12 +261,19 @@ export function GoaEnvironment() {
           zIndex: 12,
         }}
       >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-palm-tall-back {
+              display: none !important;
+            }
+          }
+        `}</style>
         <SceneImage asset={palmTall} width="100%" still />
       </div>
 
       {/* Luggage Tag - HANGING from window (left shutter area) */}
       <div
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute mobile-luggage-tag"
         style={{
           left: '50%',
           top: 'clamp(220px, 32vh, 300px)',
@@ -214,6 +282,16 @@ export function GoaEnvironment() {
           zIndex: 34,
         }}
       >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-luggage-tag {
+              left: 25px !important;
+              top: 200px !important;
+              transform: none !important;
+              width: 45px !important;
+            }
+          }
+        `}</style>
         <div style={{ transform: 'rotate(-11deg)' }}>
           <img src={luggageTagSrc} alt="" className="w-full" loading="lazy" draggable={false} />
           {/* Hang point shadow */}
@@ -237,7 +315,7 @@ export function GoaEnvironment() {
 
       {/* Frond shadow - cast by off-screen palm upper left */}
       <div
-        className="absolute"
+        className="absolute mobile-frond-shadow"
         style={{
           left: 0,
           top: 'clamp(40px, 6vh, 70px)',
@@ -249,6 +327,15 @@ export function GoaEnvironment() {
         }}
         aria-hidden="true"
       >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-frond-shadow {
+              top: 30px !important;
+              width: 280px !important;
+              height: 140px !important;
+            }
+          }
+        `}</style>
         <svg
           viewBox="0 0 700 300"
           preserveAspectRatio="none"
@@ -265,10 +352,10 @@ export function GoaEnvironment() {
       {/* LAYER 4: CENTRAL ARCHITECTURE - The Goan Window */}
       <GoaWindow mode={generatorMode} onModeChange={setGeneratorMode} />
 
-      {/* LAYER 5: BREATHING SPACE & WAVES - Below window/buttons */}
-      {/* Ocean Waves - THREE instances side by side for full coverage at crisp quality */}
+      {/* LAYER 5: WAVE BOUNDARY - BOTTOM OF MOBILE SCENE */}
+      {/* Ocean Waves - THE FINAL LAYER, NOTHING BELOW THIS */}
       <div
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute mobile-waves"
         style={{
           left: '50%',
           transform: 'translateX(-50%)',
@@ -279,6 +366,24 @@ export function GoaEnvironment() {
           opacity: 0.5,
         }}
       >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-waves {
+              left: 0 !important;
+              transform: none !important;
+              bottom: 0 !important;
+              top: auto !important;
+              width: 1400px !important;
+              margin-left: -200px !important;
+              height: 150px !important;
+              overflow: hidden !important;
+            }
+            .mobile-waves > div {
+              height: 300px !important;
+              margin-top: 0 !important;
+            }
+          }
+        `}</style>
         {/* Left wave */}
         <div style={{ flex: '0 0 33.33%' }}>
           <SceneImage 
@@ -305,9 +410,9 @@ export function GoaEnvironment() {
         </div>
       </div>
 
-      {/* Beach Direction Sign - RIGHT BOTTOM CORNER above waves */}
+      {/* Beach Direction Sign - RIGHT SIDE, overlapping waves */}
       <div
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute mobile-beach-sign"
         style={{
           right: 'clamp(-20px, -4vw, -10px)',
           top: 'clamp(820px, 118vh, 1080px)',
@@ -315,6 +420,16 @@ export function GoaEnvironment() {
           zIndex: 36,
         }}
       >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-beach-sign {
+              right: -15px !important;
+              bottom: 0 !important;
+              top: auto !important;
+              width: 180px !important;
+            }
+          }
+        `}</style>
         <div style={{ transform: 'rotate(-6deg)' }}>
           <img src={beachSignSrc} alt="" className="w-full" loading="lazy" draggable={false} />
           {/* Ground shadow - sign embedded in ground */}
