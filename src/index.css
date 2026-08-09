@@ -1,0 +1,454 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   HH Goa — design tokens.
+
+   Every colour below was sampled from the illustration set itself, so the
+   interface and the artwork are provably the same palette. Cream is the
+   ground, deep forest is the ink, and everything else is a minority accent.
+--------------------------------------------------------------------------- */
+@theme {
+  /* Paper — the ground */
+  --color-paper: #f3ebd8;
+  --color-paper-warm: #f7f1e3;
+  --color-paper-deep: #e9dcc0;
+  --color-paper-edge: #ddcdab;
+
+  /* Ink — sampled from the window's darkest timber */
+  --color-ink: #16342b;
+  --color-ink-soft: #40584d;
+  --color-forest: #1f4d3a;
+
+  /* Teal — the window's own paint */
+  --color-teal: #2f8f77;
+  --color-teal-deep: #1a5a52;
+
+  /* Accents — scooter ochre, sun orange, hibiscus coral, watercolour sea */
+  --color-ochre: #d8a830;
+  --color-sun: #e07a10;
+  --color-coral: #f0a890;
+  --color-sea: #6e9ebc;
+  --color-sage: #8a9a6a;
+
+  /* Plaster — the wall is the ground now (see Wall.tsx) */
+  --color-plaster: #d4bc90;
+  --color-plaster-lit: #dfc9a2;
+  --color-plaster-shade: #c2a87d;
+  --color-plaster-edge: #b79e74; /* corner return */
+  --color-lane: #c9ae85; /* mobile ground */
+  --color-lane-far: #cdbb9b; /* outside sliver */
+  --color-sky-far: #e0d3b8; /* outside sliver */
+
+  /* Tag stock (Tags.tsx) — ochre is illegible on the tag's paper */
+  --color-tag-numeral: #b07c24;
+
+  /* H1 ink (HeroEnvironment.tsx) — deep enough to hold on plaster */
+  --color-ink-display: #14342a;
+
+  --font-display: "Fraunces", ui-serif, Georgia, "Times New Roman", serif;
+  --font-body: "Work Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  /* Forest Green canvas — Phase 1 mobile-first requirement.
+     The page is dominated by deep forest green, not plaster/cream. */
+  html {
+    background-color: #1a3a2e;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    margin: 0;
+    background-color: #1a3a2e;
+    color: var(--color-ink);
+    font-family: var(--font-body);
+  }
+
+  /* A visible, on-brand focus ring. Never removed, only replaced. */
+  :focus-visible {
+    outline: 2px solid var(--color-teal-deep);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+}
+
+@layer components {
+  /* Pressed-paper grain. Cheap, tiled, and purely atmospheric — it keeps the
+     large flat fields from reading as digital colour. */
+  .hh-grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+  }
+
+  /* ------------------------------------------------------------------------
+     The scene's geometry.
+
+     The composition was drawn against a 1600 x 1000 frame and its coordinates
+     are literal pixels in that frame, so horizontals are vw and verticals are
+     vh — that is how the spec itself expresses them ("x1512 (94.5% of width)",
+     "y596 (59.6%)"), and it is what keeps the wall full-bleed at every ratio.
+
+     These live in CSS rather than inline because they change at `md` and an
+     inline style cannot carry a media query. `scene.ts` indexes them.
+
+     The one relationship that must never drift is bound structurally rather
+     than by number: the right shutter's cast shadow runs *from* the window's
+     own right edge *to* --hh-shadow-edge, and the tags start 2px past that.
+     Both are derived from --hh-win-w, so the gap survives any viewport.
+  ---------------------------------------------------------------------- */
+  .hh-scene {
+    /* Window. Height-driven so the scene stays inside one viewport, capped on
+       width so a tall narrow screen cannot blow it out sideways. At 1600x1000
+       both terms land on 704px, which is the approved width. */
+    --hh-win-w: min(44vw, 49.3vh * 1.4276);
+    --hh-win-h: calc(var(--hh-win-w) / 1.4276);
+    --hh-win-l: calc(55vw - var(--hh-win-w) / 2);
+    --hh-win-r: calc(55vw + var(--hh-win-w) / 2);
+    --hh-win-t: 34vh;
+
+    /* Bottom of the wooden sill: 99.348% down the window artwork box.
+       Lands on y830 at 1600x1000, which every object measures against. */
+    --hh-sill: calc(var(--hh-win-t) + var(--hh-win-h) * 0.99348);
+
+    /* Where the right shutter's shadow stops, and where the tags begin. */
+    --hh-shadow-edge: 84.25vw;
+    --hh-tags-l: 84.375vw;
+    --hh-tags-t: 54.5vh;
+    --hh-tags-w: 6vw;
+
+    /* Set into the plaster left of the tags, inside the shutter's shadow. */
+    --hh-tile-l: 79.125vw;
+    --hh-tile-w: 4.3125vw;
+    --hh-tile-t: calc(var(--hh-sill) - 4.3125vw - 0.9vh);
+
+    --hh-note-l: 23.75vw;
+    --hh-note-t: 62vh;
+    --hh-note-w: 5.75vw;
+
+    /* Top edge 30px below the sill, right edge pinned at x360 — which clears
+       the aperture's left edge (x703) by 343px at every width, because the
+       aperture is derived from --hh-win-w and this is not.
+
+       The width takes whichever is larger: its drawn proportion against the
+       window (574/704), or enough to run off the bottom of the frame. The
+       second term is what keeps it cropped by the bottom edge on a tall
+       screen, and it is honest perspective — the scooter is a metre nearer
+       than the wall, so it should outgrow it. Extra width only travels further
+       off the left edge, never toward the aperture. */
+    --hh-scooter-t: calc(var(--hh-sill) + 3vh);
+    --hh-scooter-w: max(
+      var(--hh-win-w) * 0.8153,
+      (100dvh - var(--hh-scooter-t)) * 1.4795
+    );
+    --hh-scooter-l: calc(22.5vw - var(--hh-scooter-w));
+
+    /* Type. Ranged left off a 112px margin (7vw at 1600), ragged right, and
+       entirely above the window box.
+
+       The headline and the deck are two different columns, and conflating them
+       was a bug: bound to the deck's measure the H1 broke to four lines and ran
+       down past the window's top edge. The H1 only has to clear the window
+       *vertically*, so it gets a column wide enough to hold its line breaks.
+
+       The deck is the narrow one — its measure stops 87px short of the left
+       shutter, expressed against --hh-win-l rather than as a fixed width so the
+       gutter survives any viewport, and capped at its 40ch measure. */
+    --hh-type-x: 7vw;
+    --hh-type-t: 8.4vh;
+    --hh-h1-w: 46vw;
+    --hh-deck-col: calc(var(--hh-win-l) - var(--hh-type-x) - 5.4375vw);
+
+    --hh-h1-size: clamp(2.75rem, 5.5vw, 6rem);
+    --hh-h1-leading: 0.96;
+    --hh-deck-gap: 2.6vh;
+    --hh-deck-measure: 40ch;
+    --hh-deck-size: 1.0625rem;
+
+    /* Where the plaster field stops: at the corner return on desktop, at the
+       frame edge on mobile, where there is no corner and no outside. */
+    --hh-wall-r: 5.5vw;
+    --hh-ground: none;
+  }
+
+  @media (width < 48rem) {
+    .hh-scene {
+      /* Bleeds 30px off the left edge only, which puts the aperture centre at
+         38% and opens a 61px right band — the thumb column. */
+      --hh-win-w: 92.0513vw;
+      --hh-win-h: calc(var(--hh-win-w) / 1.4276);
+      --hh-win-l: -7.6923vw;
+      --hh-win-r: 84.359vw;
+      --hh-win-t: 47.4vh;
+
+      /* The thumb column. The window's right edge sits at 84.359vw, leaving a
+         61px band to the frame edge, and both tags have to live inside it —
+         they are the only control on the page, so a clipped tag is a clipped
+         affordance. The pair is 96 units wide with the blank one's rotated
+         corner reaching furthest right, so the container is sized to land that
+         corner just inside 390 rather than 9px past it. */
+      --hh-tags-l: 83.1vw;
+      --hh-tags-t: 44vh;
+      --hh-tags-w: 12.8vw;
+
+      --hh-tile-l: 87.18vw;
+      --hh-tile-w: 8.974vw;
+      --hh-tile-t: 64vh;
+
+      --hh-note-l: 53.85vw;
+      --hh-note-t: 80vh;
+      --hh-note-w: 20.5vw;
+
+      /* Nearer than the wall — 1.3m against 2m — so it crosses the plinth, the
+         ground seam and the lane. That single overlap is what makes the phone
+         read as one picture instead of three stacked bands.
+
+         Its top edge is held below the aperture's lower edge. The window bleeds
+         off the left here, which drags the opening down and left into exactly
+         the corner the scooter occupies, and the aperture has to stay clear at
+         every viewport for the Phase 2 card. Starting at 76vh puts the scooter
+         under the opening but still above the sill line (~65vh), so it crosses
+         the plinth as intended. */
+      --hh-scooter-w: 88vw;
+      --hh-scooter-l: calc(46vw - var(--hh-scooter-w));
+      --hh-scooter-t: 76vh;
+
+      /* The window bleeds off the left here, so the desktop measure — which is
+         derived from the shutter's left edge — would go negative. Mobile ranges
+         the column against the thumb band instead, and the gap it leaves
+         between the deck and the window is *wall*, raked by the frond shadow,
+         never a cream void. */
+      --hh-type-x: 6.15vw;
+      --hh-type-t: 7.6vh;
+      --hh-h1-w: 74vw;
+      --hh-deck-col: 74vw;
+      --hh-h1-size: 2.75rem;
+      --hh-h1-leading: 0.98;
+      --hh-deck-gap: 2.2vh;
+      --hh-deck-measure: 36ch;
+      --hh-deck-size: 0.9375rem;
+
+      /* No corner return and no outside sliver: the wall runs to the edge. */
+      --hh-wall-r: 0px;
+      /* The only viewport where the ground is in frame at all. */
+      --hh-ground: 92.42vh;
+      --hh-ground-display: block;
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Entrance. The scene assembles itself the way a page is laid out by hand —
+   ground first, then the window, then the objects set down around it.
+   Motion lives only on wrappers so it never fights an element's own
+   placement transform.
+--------------------------------------------------------------------------- */
+@property --hh-settle-k {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+/* Same multiplier discipline as `hh-wash` below: the palm is authored at 0.55
+   and must still be 0.55 once it has settled. */
+@keyframes hh-settle {
+  from {
+    --hh-settle-k: 0;
+    transform: translate3d(0, 22px, 0);
+  }
+  to {
+    --hh-settle-k: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* The wash animates a *multiplier*, not absolute opacity.
+
+   This matters: a CSS animation with `forwards` outranks an inline style, so
+   animating `opacity` to 1 would drag every authored value up to full — the
+   8% frond shadow would land at 100% and the light layer would read ten times
+   too strong. Instead each element declares its own opacity via
+   `--hh-o` and the animation only scales it, so authored values survive. */
+@property --hh-wash-k {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+@keyframes hh-wash {
+  from {
+    --hh-wash-k: 0;
+  }
+  to {
+    --hh-wash-k: 1;
+  }
+}
+
+.hh-settle {
+  opacity: calc(var(--hh-o, 1) * var(--hh-settle-k));
+  animation: hh-settle 900ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+.hh-wash {
+  /* --hh-o is the element's own designed opacity; defaults to fully opaque. */
+  opacity: calc(var(--hh-o, 1) * var(--hh-wash-k));
+  animation: hh-wash 1400ms ease-out forwards;
+}
+
+/* ---------------------------------------------------------------------------
+   The tag on the nail. Three motions, all rotation about the eyelet, so the
+   tag always hangs from the nail rather than sliding around it.
+
+   `hh-breath` is deliberately sub-threshold: under 1°, ~5s, and irregular
+   because the two halves of the cycle are unequal. The moment it reads as a
+   UI pulse the no-button conceit dies, so if in doubt it is weaker.
+--------------------------------------------------------------------------- */
+@keyframes hh-breath {
+  0% {
+    transform: rotate(0deg);
+  }
+  37% {
+    transform: rotate(0.55deg);
+  }
+  61% {
+    transform: rotate(-0.18deg);
+  }
+  84% {
+    transform: rotate(0.24deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* The idle rung: one harder sway, once, and then silence. No arrow, no copy,
+   no second rung — a second one would be nagging, which is a button by
+   another name. */
+@keyframes hh-rung {
+  0% {
+    transform: rotate(0deg);
+  }
+  22% {
+    transform: rotate(2.6deg);
+  }
+  48% {
+    transform: rotate(-1.5deg);
+  }
+  72% {
+    transform: rotate(0.7deg);
+  }
+  88% {
+    transform: rotate(-0.25deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* The lift is two motions, not one: up to clear the nail head, then away
+   toward the viewer and out of the bottom of the frame. It never travels
+   toward the aperture — that arrival belongs to the Phase 2 card. */
+@keyframes hh-tag-lift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  26% {
+    transform: translate3d(0, -38px, 0) scale(1.015) rotate(-1.5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(14px, 260px, 0) scale(1.5) rotate(7deg);
+    opacity: 0;
+  }
+}
+
+/* When the blank leaves, the named tag settles a degree or two, because the
+   thing that was resting against it just left. */
+@keyframes hh-tag-settle-back {
+  0% {
+    transform: rotate(0deg);
+  }
+  40% {
+    transform: rotate(1.6deg);
+  }
+  70% {
+    transform: rotate(-0.6deg);
+  }
+  100% {
+    transform: rotate(0.9deg);
+  }
+}
+
+.hh-breath {
+  animation: hh-breath 5.1s ease-in-out infinite;
+  transform-origin: var(--hh-swing-origin, 50% 12%);
+}
+
+.hh-rung {
+  animation: hh-rung 1500ms cubic-bezier(0.34, 0.65, 0.3, 1) 1 both;
+  transform-origin: var(--hh-swing-origin, 50% 12%);
+}
+
+.hh-lift {
+  animation: hh-tag-lift 620ms cubic-bezier(0.3, 0.02, 0.4, 1) forwards;
+}
+
+.hh-settle-back {
+  animation: hh-tag-settle-back 900ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  transform-origin: var(--hh-swing-origin, 50% 12%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hh-settle,
+  .hh-wash {
+    animation: none;
+    /* Land on the authored opacity, not a flat 1 — otherwise disabling motion
+       would also blow out the light layer. */
+    opacity: var(--hh-o, 1);
+    transform: none;
+  }
+
+  /* No swing, no breath, no idle sway. The lift collapses to a fade, which
+     still conveys the one thing that matters: the tag is no longer there. */
+  .hh-breath,
+  .hh-rung,
+  .hh-settle-back {
+    animation: none;
+    transform: none;
+  }
+
+  .hh-lift {
+    animation: hh-fade-out 200ms linear forwards;
+  }
+}
+
+@keyframes hh-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Goa Hindi Levitation - subtle floating animation for logo element
+--------------------------------------------------------------------------- */
+@keyframes levitate {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(0.5deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hh-levitate {
+    animation: none;
+    transform: none;
+  }
+}

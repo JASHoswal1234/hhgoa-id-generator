@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Template Analysis</title>
+  <style>
+    body { font-family: monospace; padding: 20px; }
+    canvas { border: 1px solid #ccc; max-width: 100%; }
+    .info { margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <h1>Builder Pass Template Analysis</h1>
+  <div class="info">
+    <div>Width: <span id="width"></span>px</div>
+    <div>Height: <span id="height"></span>px</div>
+    <div>Aspect Ratio: <span id="ratio"></span></div>
+  </div>
+  <p>Click on the template to get pixel coordinates:</p>
+  <canvas id="canvas"></canvas>
+  <div id="coords"></div>
+  
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = function() {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      
+      document.getElementById('width').textContent = img.width;
+      document.getElementById('height').textContent = img.height;
+      document.getElementById('ratio').textContent = (img.width / img.height).toFixed(3);
+      
+      canvas.addEventListener('click', function(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = Math.floor((e.clientX - rect.left) * scaleX);
+        const y = Math.floor((e.clientY - rect.top) * scaleY);
+        
+        document.getElementById('coords').innerHTML = `
+          <strong>Clicked at:</strong> x=${x}, y=${y}<br>
+          <strong>Percentage:</strong> x=${((x/img.width)*100).toFixed(2)}%, y=${((y/img.height)*100).toFixed(2)}%
+        `;
+      });
+    };
+    
+    img.src = './src/assets/generator/builder-pass-template.png';
+  </script>
+</body>
+</html>
