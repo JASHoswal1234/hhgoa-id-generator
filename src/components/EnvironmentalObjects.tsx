@@ -173,8 +173,8 @@ export function EnvironmentalObjects() {
         style={{
           // Positioned on the window frame
           left: '50%',
-          top: 'clamp(150px, 22vh, 220px)',
-          transform: 'translateX(calc(-50% + clamp(100px, 26vw, 230px)))',
+          top: 'clamp(190px, 28vh, 260px)',
+          transform: 'translateX(calc(-50% + clamp(120px, 30vw, 260px)))',
           width: 'clamp(65px, 16vw, 105px)',
           zIndex: 33,
         }}

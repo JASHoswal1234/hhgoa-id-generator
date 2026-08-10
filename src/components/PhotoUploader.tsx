@@ -96,7 +96,7 @@ export function PhotoUploader({ onPhotoLoaded, currentPhoto, zoom = 1 }: PhotoUp
         <style>{`
           @media (max-width: 768px) {
             .photo-upload-button {
-              height: 45px !important;
+              height: 65px !important;
             }
           }
         `}</style>
@@ -134,7 +134,7 @@ export function PhotoUploader({ onPhotoLoaded, currentPhoto, zoom = 1 }: PhotoUp
             <style>{`
               @media (max-width: 768px) {
                 .mobile-photo-preview {
-                  height: 45px !important;
+                  height: 65px !important;
                 }
               }
             `}</style>
@@ -173,19 +173,20 @@ export function PhotoUploader({ onPhotoLoaded, currentPhoto, zoom = 1 }: PhotoUp
             <style>{`
               @media (max-width: 768px) {
                 .mobile-upload-content {
-                  padding: 0.25rem !important;
+                  padding: 0.5rem 0.25rem !important;
                 }
                 .mobile-upload-icon {
-                  width: 16px !important;
-                  height: 16px !important;
-                  margin-bottom: 0.125rem !important;
+                  width: 20px !important;
+                  height: 20px !important;
+                  margin-bottom: 0.25rem !important;
                 }
                 .mobile-upload-text {
-                  font-size: 9px !important;
-                  line-height: 1.2 !important;
+                  font-size: 11px !important;
+                  line-height: 1.3 !important;
+                  margin-bottom: 0.125rem !important;
                 }
                 .mobile-upload-subtext {
-                  font-size: 7px !important;
+                  font-size: 9px !important;
                   line-height: 1.2 !important;
                 }
               }

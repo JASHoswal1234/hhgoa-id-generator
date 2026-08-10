@@ -20,9 +20,10 @@ interface BuilderPassModeProps {
     onReset: () => void
   } | null) => void
   onError?: (error: string | null) => void
+  onMobileGenerateButton?: (button: React.ReactNode | null) => void
 }
 
-export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError }: BuilderPassModeProps) {
+export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError, onMobileGenerateButton }: BuilderPassModeProps) {
   const [photo, setPhoto] = useState<HTMLImageElement | null>(null)
   const [name, setName] = useState('')
   const [role, setRole] = useState('')
@@ -30,6 +31,7 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError }
   const [generatedCanvas, setGeneratedCanvas] = useState<HTMLCanvasElement | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [photoZoom, setPhotoZoom] = useState<number>(1)
+  const [showMobileButton, setShowMobileButton] = useState(false)
 
   const canGenerate = photo && name.trim() && role.trim()
 
@@ -46,10 +48,35 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError }
     }
   }
 
-  const handleShareToX = () => {
-    const text = encodeURIComponent('Made it to Goa. Built something worth staying for.\n\n#FrameInGoa')
-    const url = `https://twitter.com/intent/tweet?text=${text}`
-    window.open(url, '_blank', 'noopener,noreferrer')
+  const handleShareToX = async () => {
+    if (!generatedCanvas) return
+
+    try {
+      // First, automatically download the image
+      await downloadCanvas(generatedCanvas, 'hh-goa-builder-pass.png')
+      
+      // Small delay to ensure download starts
+      await new Promise(resolve => setTimeout(resolve, 300))
+      
+      // Then open X with pre-filled text
+      const text = encodeURIComponent(
+        'Made it to Goa. Built something worth staying for.\n\n' +
+        'Just got my official Builder Pass! 🏖️\n\n' +
+        'Create yours: https://hhgoa-id-generator-psi.vercel.app\n\n' +
+        '#FrameInGoa #BuilderLife #GoaVibes'
+      )
+      window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank', 'noopener,noreferrer')
+    } catch (err) {
+      console.error('Share error:', err)
+      // Fallback to just opening X
+      const text = encodeURIComponent(
+        'Made it to Goa. Built something worth staying for.\n\n' +
+        'Just got my official Builder Pass! 🏖️\n\n' +
+        'Create yours: https://hhgoa-id-generator-psi.vercel.app\n\n' +
+        '#FrameInGoa #BuilderLife #GoaVibes'
+      )
+      window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank', 'noopener,noreferrer')
+    }
   }
 
   const handleReset = () => {
@@ -92,6 +119,44 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError }
     }
   }
 
+  // Notify parent of mobile generate button state
+  useEffect(() => {
+    const checkMobile = () => {
+      setShowMobileButton(window.innerWidth <= 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // Pass mobile generate button to parent when on mobile and form is showing
+  useEffect(() => {
+    if (showMobileButton && !generatedCanvas && onMobileGenerateButton) {
+      const mobileButton = (
+        <button
+          onClick={handleGenerate}
+          disabled={!canGenerate || generating}
+          className="rounded-sm px-4 py-2 font-body text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a5a52] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          style={{
+            background: canGenerate ? '#FEE101' : 'rgba(254,225,1,0.3)',
+            color: '#1a3a2e',
+            minHeight: '38px',
+            width: '280px',
+            maxWidth: '90%',
+            margin: '0 auto',
+            fontSize: '13px',
+            padding: '0 16px',
+          }}
+        >
+          {generating ? 'Generating...' : 'Generate Pass'}
+        </button>
+      )
+      onMobileGenerateButton(mobileButton)
+    } else if (onMobileGenerateButton) {
+      onMobileGenerateButton(null)
+    }
+  }, [showMobileButton, generatedCanvas, canGenerate, generating, onMobileGenerateButton])
+
   // Notify parent of action handlers when canvas is generated
   useEffect(() => {
     if (generatedCanvas) {
@@ -124,11 +189,75 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError }
 
   // FORM STATE: Show generator form
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center px-6">
-      <div className="w-full space-y-2" style={{ maxWidth: '300px' }}>
+    <div className="flex h-full w-full flex-col items-center justify-center px-6 mobile-form-wrapper">
+      <style>{`
+        @media (max-width: 768px) {
+          .mobile-form-wrapper {
+            justify-content: flex-start !important;
+            padding-top: 12px !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+          }
+          
+          .mobile-form-content {
+            gap: 5px !important;
+          }
+          
+          .mobile-form-label {
+            margin-bottom: 2px !important;
+            font-size: 10px !important;
+            font-weight: 500 !important;
+          }
+          
+          .mobile-form-input {
+            min-height: 34px !important;
+            height: 34px !important;
+            padding: 0 10px !important;
+            font-size: 13px !important;
+            line-height: 34px !important;
+          }
+          
+          .mobile-form-button {
+            min-height: 36px !important;
+            height: 36px !important;
+            padding: 0 12px !important;
+            font-size: 13px !important;
+            line-height: 36px !important;
+          }
+          
+          /* Photo section compact layout */
+          .mobile-photo-section {
+            margin-bottom: 5px !important;
+          }
+          
+          /* Zoom control - compact and inline */
+          .mobile-zoom-wrapper {
+            margin-top: 3px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+            height: 20px !important;
+          }
+          
+          .mobile-zoom-label {
+            font-size: 9px !important;
+            margin: 0 !important;
+            flex-shrink: 0 !important;
+            width: 32px !important;
+            line-height: 20px !important;
+          }
+          
+          .mobile-zoom-slider {
+            height: 16px !important;
+            flex: 1 !important;
+          }
+        }
+      `}</style>
+      
+      <div className="w-full space-y-2 mobile-form-content" style={{ maxWidth: '300px' }}>
         {/* Photo Upload */}
-        <div>
-          <label className="mb-1 block font-body text-xs font-medium text-[#14342a]">
+        <div className="mobile-photo-section">
+          <label className="mb-1 block font-body text-xs font-medium text-[#14342a] mobile-form-label">
             Your Photo
           </label>
           <PhotoUploader 
@@ -137,8 +266,8 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError }
             zoom={photoZoom}
           />
           {photo && (
-            <div className="mt-2">
-              <label className="mb-1 block font-body text-xs font-medium text-[#14342a]">
+            <div className="mt-2 mobile-zoom-wrapper">
+              <label className="block font-body text-xs font-medium text-[#14342a] mobile-zoom-label">
                 Zoom
               </label>
               <input
@@ -148,7 +277,7 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError }
                 step="0.1"
                 value={photoZoom}
                 onChange={(e) => setPhotoZoom(parseFloat(e.target.value))}
-                className="w-full"
+                className="w-full mobile-zoom-slider"
                 style={{
                   accentColor: '#1a3a2e',
                 }}
@@ -159,7 +288,7 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError }
 
         {/* Name */}
         <div>
-          <label htmlFor="name" className="mb-1 block font-body text-xs font-medium text-[#14342a]">
+          <label htmlFor="name" className="mb-1 block font-body text-xs font-medium text-[#14342a] mobile-form-label">
             Name
           </label>
           <input
@@ -170,7 +299,7 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError }
             placeholder="Enter your name"
             maxLength={50}
             required
-            className="w-full rounded-sm border px-3 py-2 font-body text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a5a52]"
+            className="w-full rounded-sm border px-3 py-2 font-body text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a5a52] mobile-form-input"
             style={{
               background: '#fff',
               border: '1.5px solid rgba(31,77,58,0.25)',
@@ -182,7 +311,7 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError }
 
         {/* Role */}
         <div>
-          <label htmlFor="role" className="mb-1 block font-body text-xs font-medium text-[#14342a]">
+          <label htmlFor="role" className="mb-1 block font-body text-xs font-medium text-[#14342a] mobile-form-label">
             Role
           </label>
           <input
@@ -190,10 +319,10 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError }
             type="text"
             value={role}
             onChange={(e) => setRole(e.target.value)}
-            placeholder="e.g. Founder, Developer"
+            placeholder="Founder / Developer / Designer"
             maxLength={50}
             required
-            className="w-full rounded-sm border px-3 py-2 font-body text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a5a52]"
+            className="w-full rounded-sm border px-3 py-2 font-body text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a5a52] mobile-form-input"
             style={{
               background: '#fff',
               border: '1.5px solid rgba(31,77,58,0.25)',
@@ -203,19 +332,21 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError }
           />
         </div>
 
-        {/* Generate Button */}
-        <button
-          onClick={handleGenerate}
-          disabled={!canGenerate || generating}
-          className="w-full rounded-sm px-4 py-2 font-body text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a5a52] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          style={{
-            background: canGenerate ? '#FEE101' : 'rgba(254,225,1,0.3)',
-            color: '#1a3a2e',
-            minHeight: '40px',
-          }}
-        >
-          {generating ? 'Generating...' : 'Generate Pass'}
-        </button>
+        {/* Generate Button - Hidden on mobile, shown on desktop */}
+        {!showMobileButton && (
+          <button
+            onClick={handleGenerate}
+            disabled={!canGenerate || generating}
+            className="w-full rounded-sm px-4 py-2 font-body text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a5a52] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mobile-form-button"
+            style={{
+              background: canGenerate ? '#FEE101' : 'rgba(254,225,1,0.3)',
+              color: '#1a3a2e',
+              minHeight: '40px',
+            }}
+          >
+            {generating ? 'Generating...' : 'Generate Pass'}
+          </button>
+        )}
 
         {error && (
           <p className="mt-1 font-body text-xs text-[#d85050]" role="alert">
@@ -294,6 +425,7 @@ export function BuilderPassActions({
             flex: '1 1 auto',
             minWidth: '140px',
           }}
+          title="Downloads image and opens X for sharing"
         >
           Share on X #FrameInGoa
         </button>

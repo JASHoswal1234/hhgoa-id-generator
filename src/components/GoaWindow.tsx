@@ -31,14 +31,58 @@ export function GoaWindow({ mode }: GoaWindowProps) {
     onReset: () => void
   } | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [mobileGenerateButton, setMobileGenerateButton] = useState<React.ReactNode | null>(null)
 
   return (
     <>
+      {/* Heading above window */}
+      <div
+        className="absolute mobile-heading"
+        style={{
+          left: '50%',
+          top: 'clamp(160px, 24vh, 240px)',
+          transform: 'translateX(-50%)',
+          width: 'clamp(330px, 88vw, 720px)',
+          maxWidth: '720px',
+          textAlign: 'center',
+          zIndex: 29,
+        }}
+      >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-heading {
+              top: 120px !important;
+              width: 92vw !important;
+              max-width: 440px !important;
+            }
+            .mobile-heading h2 {
+              font-size: 0.95rem !important;
+              line-height: 1.2 !important;
+              white-space: nowrap !important;
+            }
+          }
+        `}</style>
+        <h2
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(1.5rem, 2.5vw, 2rem)',
+            fontWeight: 600,
+            color: '#f7f1e3',
+            margin: 0,
+            padding: '0 1rem',
+            letterSpacing: '-0.02em',
+            lineHeight: 1.2,
+          }}
+        >
+          Create your personalized Builder Pass
+        </h2>
+      </div>
+
       <div
         className="absolute mobile-window"
         style={{
           left: '50%',
-          top: 'clamp(200px, 28vh, 280px)',
+          top: 'clamp(240px, 32vh, 320px)',
           transform: 'translateX(-50%)',
           // SUBSTANTIALLY LARGER - window is the dominant visual object
           // Desktop: ~50% viewport width, Mobile: ~88% viewport width
@@ -72,6 +116,7 @@ export function GoaWindow({ mode }: GoaWindowProps) {
             onGeneratedCanvas={setGeneratedCanvas}
             onActionHandlers={setActionHandlers}
             onError={setError}
+            onMobileGenerateButton={setMobileGenerateButton}
           />
         </div>
 
@@ -201,7 +246,7 @@ export function GoaWindow({ mode }: GoaWindowProps) {
           className="absolute mobile-actions"
           style={{
             left: '50%',
-            top: 'clamp(740px, 97vh, 920px)',
+            top: 'clamp(780px, 101vh, 960px)',
             transform: 'translateX(-50%)',
             width: 'clamp(330px, 88vw, 720px)',
             maxWidth: '720px',
@@ -224,6 +269,39 @@ export function GoaWindow({ mode }: GoaWindowProps) {
             onReset={actionHandlers.onReset}
             error={error}
           />
+        </div>
+      )}
+
+      {/* Mobile Generate Button - rendered BELOW the window frame on mobile only */}
+      {mobileGenerateButton && !generatedCanvas && (
+        <div
+          className="mobile-generate-button-container"
+          style={{
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '92vw',
+            maxWidth: '440px',
+            zIndex: 30,
+            paddingTop: '12px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <style>{`
+            @media (max-width: 768px) {
+              .mobile-generate-button-container {
+                top: 480px !important;
+              }
+            }
+            @media (min-width: 769px) {
+              .mobile-generate-button-container {
+                display: none !important;
+              }
+            }
+          `}</style>
+          {mobileGenerateButton}
         </div>
       )}
     </>

@@ -290,14 +290,16 @@
 }
 
 .hh-settle {
-  opacity: calc(var(--hh-o, 1) * var(--hh-settle-k));
-  animation: hh-settle 900ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  /* DISABLED FOR INSTANT LOAD - Animation removed for faster initial display */
+  opacity: var(--hh-o, 1);
+  /* animation: hh-settle 900ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards; */
 }
 
 .hh-wash {
+  /* DISABLED FOR INSTANT LOAD - Animation removed for faster initial display */
   /* --hh-o is the element's own designed opacity; defaults to fully opaque. */
-  opacity: calc(var(--hh-o, 1) * var(--hh-wash-k));
-  animation: hh-wash 1400ms ease-out forwards;
+  opacity: var(--hh-o, 1);
+  /* animation: hh-wash 1400ms ease-out forwards; */
 }
 
 /* ---------------------------------------------------------------------------

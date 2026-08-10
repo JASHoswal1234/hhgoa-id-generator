@@ -10,6 +10,7 @@ interface WindowApertureProps {
     onReset: () => void
   } | null) => void
   onError?: (error: string | null) => void
+  onMobileGenerateButton?: (button: React.ReactNode | null) => void
 }
 
 /**
@@ -21,7 +22,7 @@ interface WindowApertureProps {
  * The frame remains visually dominant. Content lives inside the architecture,
  * not over it.
  */
-export function WindowAperture({ mode, onGeneratedCanvas, onActionHandlers, onError }: WindowApertureProps) {
+export function WindowAperture({ mode, onGeneratedCanvas, onActionHandlers, onError, onMobileGenerateButton }: WindowApertureProps) {
   return (
     <div className="relative h-full w-full overflow-hidden">
       {/* Warm cream interior - visible through window */}
@@ -40,6 +41,7 @@ export function WindowAperture({ mode, onGeneratedCanvas, onActionHandlers, onEr
             onGeneratedCanvas={onGeneratedCanvas}
             onActionHandlers={onActionHandlers}
             onError={onError}
+            onMobileGenerateButton={onMobileGenerateButton}
           />
         ) : (
           <BuilderIdentityMode />
