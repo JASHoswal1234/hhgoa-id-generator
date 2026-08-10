@@ -5,7 +5,7 @@
  * Supports JPG, PNG, and HEIC
  */
 
-import { useState, useRef, type ChangeEvent } from 'react'
+import { useState, useRef, useEffect, type ChangeEvent } from 'react'
 import { loadImage, validateImageFile, isHEIC, convertHEICToJPEG } from '../utils/imageProcessing'
 
 interface PhotoUploaderProps {
@@ -19,6 +19,15 @@ export function PhotoUploader({ onPhotoLoaded, currentPhoto, zoom = 1 }: PhotoUp
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Cleanup object URLs when component unmounts or preview changes
+  useEffect(() => {
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview)
+      }
+    }
+  }, [preview])
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -42,7 +51,8 @@ export function PhotoUploader({ onPhotoLoaded, currentPhoto, zoom = 1 }: PhotoUp
         try {
           processedFile = await convertHEICToJPEG(file)
         } catch (conversionError) {
-          setError('HEIC format not supported in your browser. Please use JPG or PNG.')
+          const errorMsg = conversionError instanceof Error ? conversionError.message : 'Couldn\'t process this HEIC photo. Please try another image.'
+          setError(errorMsg)
           setLoading(false)
           return
         }
@@ -51,6 +61,11 @@ export function PhotoUploader({ onPhotoLoaded, currentPhoto, zoom = 1 }: PhotoUp
       // Load image
       const img = await loadImage(processedFile)
       const previewUrl = URL.createObjectURL(processedFile)
+      
+      // Clean up old preview URL if exists
+      if (preview) {
+        URL.revokeObjectURL(preview)
+      }
       
       setPreview(previewUrl)
       onPhotoLoaded(img)

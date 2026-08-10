@@ -38,36 +38,33 @@ export function isHEIC(file: File): boolean {
 }
 
 /**
- * Convert HEIC to JPEG using canvas (fallback)
- * In production, you might want to use a library like heic2any
+ * Convert HEIC to JPEG using heic2any library
  */
 export async function convertHEICToJPEG(file: File): Promise<File> {
-  // For now, attempt to load directly - modern browsers may support HEIC
   try {
-    const img = await loadImage(file)
+    // Dynamically import heic2any to avoid loading it for JPG/PNG uploads
+    const heic2any = await import('heic2any')
     
-    // Create canvas and convert to JPEG
-    const canvas = document.createElement('canvas')
-    canvas.width = img.width
-    canvas.height = img.height
-    const ctx = canvas.getContext('2d')
-    if (!ctx) throw new Error('Canvas context not available')
-    
-    ctx.drawImage(img, 0, 0)
-    
-    // Convert to blob
-    const blob = await new Promise<Blob>((resolve, reject) => {
-      canvas.toBlob(
-        (blob) => blob ? resolve(blob) : reject(new Error('Blob conversion failed')),
-        'image/jpeg',
-        0.95
-      )
+    // Convert HEIC to JPEG
+    const convertedBlob = await heic2any.default({
+      blob: file,
+      toType: 'image/jpeg',
+      quality: 0.92
     })
     
-    return new File([blob], file.name.replace(/\.heic$/i, '.jpg'), { type: 'image/jpeg' })
+    // heic2any can return Blob or Blob[], normalize to single Blob
+    const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob
+    
+    if (!blob) {
+      throw new Error('Conversion failed to produce a valid image')
+    }
+    
+    // Create a new File from the converted Blob
+    const fileName = file.name.replace(/\.heic$/i, '.jpg').replace(/\.heif$/i, '.jpg')
+    return new File([blob], fileName, { type: 'image/jpeg' })
   } catch (error) {
     console.error('HEIC conversion failed:', error)
-    throw new Error('HEIC format not supported. Please use JPG or PNG.')
+    throw new Error('Couldn\'t process this HEIC photo. Please try another image.')
   }
 }
 
