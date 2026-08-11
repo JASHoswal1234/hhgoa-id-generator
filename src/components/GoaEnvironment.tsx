@@ -43,7 +43,8 @@ export function GoaEnvironment() {
         // Desktop: 140dvh for full scene
         // Mobile: auto-height based on content flow
         minHeight: '140dvh',
-        backgroundColor: '#1a3a2e',
+        backgroundColor: 'transparent', // Background now handled by RippleGrid
+        pointerEvents: 'none', // Allow clicks to pass through to RippleGrid
       }}
       aria-label="Hacker House Goa"
     >
@@ -58,20 +59,15 @@ export function GoaEnvironment() {
         }
       `}</style>
 
-      {/* LAYER 1: Environmental Base - Forest Green Wall */}
-      <div className="absolute inset-0">
-        {/* Base wall */}
-        <div
-          className="absolute inset-0"
-          style={{ background: '#1a3a2e' }}
-        />
-
+      {/* LAYER 1: Environmental Base - Subtle overlays only (background now via RippleGrid) */}
+      <div className="absolute inset-0" style={{ zIndex: 1, pointerEvents: 'none' }}>
         {/* Sun-side wash - light from upper left */}
         <div
           className="absolute inset-0"
           style={{
             background:
               'radial-gradient(58% 58% at 16% 18%, rgba(31,77,58,0.7) 0%, rgba(26,58,46,0) 68%)',
+            pointerEvents: 'none',
           }}
         />
 
@@ -81,6 +77,7 @@ export function GoaEnvironment() {
           style={{
             background:
               'linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 64%, rgba(0,0,0,0.16) 100%), linear-gradient(to top, rgba(0,0,0,0.14) 0%, rgba(0,0,0,0) 20%)',
+            pointerEvents: 'none',
           }}
         />
 
@@ -92,6 +89,7 @@ export function GoaEnvironment() {
             mixBlendMode: 'multiply',
             background:
               'radial-gradient(circle at 50% 82%, rgba(64,88,77,1) 0%, rgba(0,0,0,0) 55%), radial-gradient(circle at 28% 68%, rgba(64,88,77,1) 0%, rgba(0,0,0,0) 38%)',
+            pointerEvents: 'none',
           }}
         />
       </div>
@@ -350,7 +348,9 @@ export function GoaEnvironment() {
       </div>
 
       {/* LAYER 4: CENTRAL ARCHITECTURE - The Goan Window */}
-      <GoaWindow mode={generatorMode} onModeChange={setGeneratorMode} />
+      <div style={{ pointerEvents: 'auto' }}>
+        <GoaWindow mode={generatorMode} onModeChange={setGeneratorMode} />
+      </div>
 
       {/* LAYER 5: WAVE BOUNDARY - BOTTOM OF MOBILE SCENE */}
       {/* Ocean Waves - THE FINAL LAYER, NOTHING BELOW THIS */}
@@ -450,7 +450,9 @@ export function GoaEnvironment() {
       </div>
 
       {/* LAYER 6: Environmental Objects - physical relationships with window */}
-      <EnvironmentalObjects />
+      <div style={{ pointerEvents: 'auto' }}>
+        <EnvironmentalObjects />
+      </div>
     </section>
   )
 }

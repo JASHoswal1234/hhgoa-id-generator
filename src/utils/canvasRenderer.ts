@@ -190,9 +190,20 @@ export async function renderBuilderPass(
   
   // LAYER 4: Draw role
   ctx.fillStyle = '#40584d'
-  ctx.font = `500 ${width * 0.032}px "Work Sans", sans-serif`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
+  
+  // Handle long roles by measuring and shrinking if needed
+  let roleFontSize = width * 0.032
+  ctx.font = `500 ${roleFontSize}px "Work Sans", sans-serif`
+  let roleWidth = ctx.measureText(data.stack).width
+  const maxRoleWidth = width * 0.65
+  
+  if (roleWidth > maxRoleWidth) {
+    roleFontSize = (roleFontSize * maxRoleWidth) / roleWidth
+    ctx.font = `500 ${roleFontSize}px "Work Sans", sans-serif`
+  }
+  
   ctx.fillText(data.stack, roleArea.x, roleArea.y)
   
   // LAYER 5: Draw Builder ID
