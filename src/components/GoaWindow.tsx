@@ -3,10 +3,10 @@ import { SceneImage } from './environment/SceneImage'
 import { windowFrame } from '../assets/registry'
 import { WindowAperture } from './WindowAperture'
 import { BuilderPassActions } from './BuilderPassMode'
-import lighthousePosterSrc from '../assets/illustrations/decor/goa-lighthouse-poster.png'
-import keychainSrc from '../assets/illustrations/travel/travel-keychain.png'
-import escKeySrc from '../assets/illustrations/decor/esc-key.png'
-import redFlowerSrc from '../assets/illustrations/nature/red-flower.png'
+import lighthousePosterSrc from '../assets/illustrations/decor/goa-lighthouse-poster.webp'
+import keychainSrc from '../assets/illustrations/travel/travel-keychain.webp'
+import escKeySrc from '../assets/illustrations/decor/esc-key.webp'
+import redFlowerSrc from '../assets/illustrations/nature/red-flower.webp'
 
 interface GoaWindowProps {
   mode: 'pass' | 'identity'
@@ -106,7 +106,6 @@ export function GoaWindow({ mode }: GoaWindowProps) {
             src={escKeySrc}
             alt=""
             className="w-full"
-            loading="lazy"
             draggable={false}
           />
           {/* Key shadow */}
@@ -229,7 +228,6 @@ export function GoaWindow({ mode }: GoaWindowProps) {
               src={redFlowerSrc}
               alt=""
               className="w-full"
-              loading="lazy"
               draggable={false}
             />
             {/* Flower shadow */}
@@ -260,7 +258,6 @@ export function GoaWindow({ mode }: GoaWindowProps) {
               src={lighthousePosterSrc}
               alt=""
               className="w-full"
-              loading="lazy"
               draggable={false}
             />
             {/* Poster shadow */}
@@ -291,7 +288,6 @@ export function GoaWindow({ mode }: GoaWindowProps) {
               src={keychainSrc}
               alt=""
               className="w-full"
-              loading="lazy"
               draggable={false}
             />
             {/* Keychain shadow */}

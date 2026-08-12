@@ -5,10 +5,10 @@ import { SceneImage } from './environment/SceneImage'
 import { palmTall, oceanWaves } from '../assets/registry'
 
 // Additional nature/environmental assets
-import palmShortSrc from '../assets/illustrations/nature/palm-tree-short.png'
-import sunSrc from '../assets/illustrations/nature/sun-handdrawn.png'
-import beachSignSrc from '../assets/illustrations/props/beach-direction-sign.png'
-import luggageTagSrc from '../assets/illustrations/travel/vintage-luggage-tag.png'
+import palmShortSrc from '../assets/illustrations/nature/palm-tree-short.webp'
+import sunSrc from '../assets/illustrations/nature/sun-handdrawn.webp'
+import beachSignSrc from '../assets/illustrations/props/beach-direction-sign.webp'
+import luggageTagSrc from '../assets/illustrations/travel/vintage-luggage-tag.webp'
 
 // Logo assets
 import studio247Src from '../assets/logo/2-47.svg'
@@ -194,7 +194,7 @@ export function GoaEnvironment() {
             }
           }
         `}</style>
-        <img src={sunSrc} alt="" className="w-full" loading="lazy" draggable={false} />
+        <img src={sunSrc} alt="" className="w-full" draggable={false} />
       </div>
 
       {/* Palm Tall - DOMINANT tree (LEFT, GROUNDED - trunk enters from bottom) */}
@@ -242,7 +242,7 @@ export function GoaEnvironment() {
             }
           }
         `}</style>
-        <img src={palmShortSrc} alt="" className="w-full" loading="lazy" draggable={false} />
+        <img src={palmShortSrc} alt="" className="w-full" draggable={false} />
       </div>
 
       {/* Palm Tall - BEHIND scooter (left side, filling empty space) */}
@@ -288,7 +288,7 @@ export function GoaEnvironment() {
           }
         `}</style>
         <div style={{ transform: 'rotate(-11deg)' }}>
-          <img src={luggageTagSrc} alt="" className="w-full" loading="lazy" draggable={false} />
+          <img src={luggageTagSrc} alt="" className="w-full" draggable={false} />
           {/* Hang point shadow */}
           <div
             className="absolute"

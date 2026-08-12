@@ -2,9 +2,9 @@ import { SceneImage } from './environment/SceneImage'
 import { scooter, fishTile } from '../assets/registry'
 
 // Travel objects with physical placement
-import cameraSrc from '../assets/illustrations/travel/vintage-camera.png'
-import passportSrc from '../assets/illustrations/travel/passport-template.png'
-import postageSrc from '../assets/illustrations/travel/paradise-postage-stamp.png'
+import cameraSrc from '../assets/illustrations/travel/vintage-camera.webp'
+import passportSrc from '../assets/illustrations/travel/passport-template.webp'
+import postageSrc from '../assets/illustrations/travel/paradise-postage-stamp.webp'
 
 /**
  * Environmental Objects - Physical relationships with window and wall
@@ -53,7 +53,6 @@ export function EnvironmentalObjects() {
             src={cameraSrc}
             alt=""
             className="w-full"
-            loading="lazy"
             draggable={false}
           />
           {/* Strong contact shadow - rests on sill */}
@@ -102,7 +101,6 @@ export function EnvironmentalObjects() {
             src={passportSrc}
             alt=""
             className="w-full"
-            loading="lazy"
             draggable={false}
           />
           {/* Paper edge shadow - on wall */}
@@ -195,7 +193,6 @@ export function EnvironmentalObjects() {
             src={postageSrc}
             alt=""
             className="w-full"
-            loading="lazy"
             draggable={false}
           />
           {/* Paper shadow */}

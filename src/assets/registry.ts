@@ -27,11 +27,11 @@ export interface SceneAsset {
   readonly alt: string
 }
 
-import windowFrameSrc from './illustrations/architecture/goan-window-frame.png'
-import palmTallSrc from './illustrations/nature/palm-tree-tall.png'
-import wavesSrc from './illustrations/nature/ocean-waves.png'
-import scooterSrc from './illustrations/props/yellow-scooter.png'
-import fishTileSrc from './illustrations/decor/fish-tile-art.png'
+import windowFrameSrc from './illustrations/architecture/goan-window-frame.webp'
+import palmTallSrc from './illustrations/nature/palm-tree-tall.webp'
+import wavesSrc from './illustrations/nature/ocean-waves.webp'
+import scooterSrc from './illustrations/props/yellow-scooter.webp'
+import fishTileSrc from './illustrations/decor/fish-tile-art.webp'
 
 export const windowFrame: SceneAsset = {
   src: windowFrameSrc,
