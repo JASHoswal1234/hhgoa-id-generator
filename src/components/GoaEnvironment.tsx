@@ -121,6 +121,7 @@ export function GoaEnvironment() {
           alt="2:47 PM Studio"
           className="w-full"
           loading="eager"
+          fetchPriority="high"
           draggable={false}
         />
       </div>
@@ -150,15 +151,16 @@ export function GoaEnvironment() {
             alt="Hacker House Goa"
             className="w-full"
             loading="eager"
+            fetchPriority="high"
             draggable={false}
           />
           
-          {/* Goa Hindi element with levitation animation */}
+          {/* Goa Hindi element with levitation animation - positioned so bottom of animation aligns with logo bottom */}
           <div
             className="absolute hh-levitate"
             style={{
-              left: '50%',
-              top: '48%',
+              left: '47%',
+              top: '25%',
               transform: 'translate(-50%, -50%)',
               width: '18%',
               animation: 'levitate 4s ease-in-out infinite',
@@ -169,6 +171,7 @@ export function GoaEnvironment() {
               alt=""
               className="w-full"
               loading="eager"
+              fetchPriority="high"
               draggable={false}
             />
           </div>

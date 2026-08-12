@@ -10,7 +10,7 @@
 
 import { useState } from 'react'
 import { PhotoUploader } from './PhotoUploader'
-import { renderBuilderPass, downloadCanvas } from '../utils/canvasRenderer'
+import { renderBuilderPass, downloadCanvas, generateBuilderId } from '../utils/canvasRenderer'
 
 export function BuilderPassGenerator() {
   const [photo, setPhoto] = useState<HTMLImageElement | null>(null)
@@ -29,6 +29,9 @@ export function BuilderPassGenerator() {
     setError(null)
     setGenerating(true)
 
+    // Generate Builder ID immediately
+    const builderId = generateBuilderId()
+
     try {
       const canvas = await renderBuilderPass({
         photo,
@@ -36,7 +39,7 @@ export function BuilderPassGenerator() {
         stack: role.trim(),
         builderTitle: 'HH Goa Builder',
         zoom: photoZoom
-      })
+      }, builderId)
       
       setGeneratedCanvas(canvas)
     } catch (err) {

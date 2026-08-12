@@ -61,6 +61,15 @@ export function RippleGrid({
     const { row: clickedRow, col: clickedCol } = triggerCell
     const cells = gridRef.current.querySelectorAll(".cell")
 
+    // Calculate max possible distance from clicked cell to any grid edge
+    // This normalizes the ripple speed regardless of click position
+    const maxDistanceToEdge = Math.max(
+      clickedRow + clickedCol, // distance to top-left corner
+      clickedRow + (size - 1 - clickedCol), // distance to top-right corner
+      (size - 1 - clickedRow) + clickedCol, // distance to bottom-left corner
+      (size - 1 - clickedRow) + (size - 1 - clickedCol) // distance to bottom-right corner
+    )
+
     cells.forEach((cell) => {
       const htmlCell = cell as HTMLElement
       const row = Number.parseInt(htmlCell.dataset.row || "0")
@@ -68,15 +77,19 @@ export function RippleGrid({
 
       // Manhattan distance
       const distance = Math.abs(row - clickedRow) + Math.abs(col - clickedCol)
-
+      
+      // Normalize distance to create consistent perceived speed
+      // Ripple from center reaches edge in same time as ripple from edge
+      const normalizedDistance = (distance / maxDistanceToEdge) * (size * 1.4)
+      
       setTimeout(() => {
         htmlCell.classList.add("pulse")
         setTimeout(() => {
           htmlCell.classList.remove("pulse")
         }, pulseDuration + 200)
-      }, distance * rippleDelay)
+      }, normalizedDistance * rippleDelay)
     })
-  }, [triggerCell, pulseDuration, rippleDelay, reducedMotion])
+  }, [triggerCell, pulseDuration, rippleDelay, reducedMotion, size])
 
   const isFilled = (row: number, col: number) => {
     return filledCells.some((cell) => cell.row === row && cell.col === col)

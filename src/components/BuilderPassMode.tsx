@@ -10,7 +10,7 @@
 
 import { useState, useEffect } from 'react'
 import { PhotoUploader } from './PhotoUploader'
-import { renderBuilderPass, downloadCanvas } from '../utils/canvasRenderer'
+import { renderBuilderPass, downloadCanvas, generateBuilderId } from '../utils/canvasRenderer'
 
 interface BuilderPassModeProps {
   onGeneratedCanvas?: (canvas: HTMLCanvasElement | null) => void
@@ -32,6 +32,8 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError, 
   const [error, setError] = useState<string | null>(null)
   const [photoZoom, setPhotoZoom] = useState<number>(1)
   const [showMobileButton, setShowMobileButton] = useState(false)
+  // Store generated Builder ID (available for future features like sharing URL)
+  const [_builderId, setBuilderId] = useState<string | null>(null)
 
   const canGenerate = photo && name.trim() && role.trim()
 
@@ -115,6 +117,7 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError, 
     setRole('')
     setError(null)
     setPhotoZoom(1)
+    setBuilderId(null) // Clear ID when making another
     onGeneratedCanvas?.(null)
     onActionHandlers?.(null)
     onError?.(null)
@@ -127,6 +130,10 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError, 
     onError?.(null)
     setGenerating(true)
 
+    // Generate Builder ID IMMEDIATELY before any expensive operations
+    const newBuilderId = generateBuilderId()
+    setBuilderId(newBuilderId)
+
     try {
       const canvas = await renderBuilderPass({
         photo,
@@ -134,7 +141,7 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError, 
         stack: role.trim(),
         builderTitle: 'HH Goa Builder',
         zoom: photoZoom
-      })
+      }, newBuilderId) // Pass pre-generated ID
       
       setGeneratedCanvas(canvas)
       onGeneratedCanvas?.(canvas)
@@ -143,6 +150,7 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError, 
       const errorMsg = 'Failed to generate. Please try again.'
       setError(errorMsg)
       onError?.(errorMsg)
+      setBuilderId(null) // Clear ID on failure
     } finally {
       setGenerating(false)
     }

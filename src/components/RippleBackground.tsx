@@ -19,7 +19,8 @@ export function RippleBackground() {
   useEffect(() => {
     const calculateGrid = () => {
       const isMobile = window.innerWidth <= 768
-      const cellSize = isMobile ? 28 : 36
+      // Reduce cells on mobile for better performance
+      const cellSize = isMobile ? 32 : 36
       const cols = Math.ceil(window.innerWidth / cellSize) + 1
       const rows = Math.ceil(window.innerHeight / cellSize) + 1
 

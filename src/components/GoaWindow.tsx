@@ -5,6 +5,8 @@ import { WindowAperture } from './WindowAperture'
 import { BuilderPassActions } from './BuilderPassMode'
 import lighthousePosterSrc from '../assets/illustrations/decor/goa-lighthouse-poster.png'
 import keychainSrc from '../assets/illustrations/travel/travel-keychain.png'
+import escKeySrc from '../assets/illustrations/decor/esc-key.png'
+import redFlowerSrc from '../assets/illustrations/nature/red-flower.png'
 
 interface GoaWindowProps {
   mode: 'pass' | 'identity'
@@ -76,6 +78,48 @@ export function GoaWindow({ mode }: GoaWindowProps) {
         >
           Create your personalized Builder Pass
         </h2>
+      </div>
+
+      {/* ESC Key - Beside heading (to the left), desktop: further left */}
+      <div
+        className="pointer-events-none absolute mobile-esc-key"
+        style={{
+          left: '50%',
+          top: 'clamp(120px, 20vh, 200px)',
+          transform: 'translateX(calc(-50% - clamp(280px, 65vw, 560px)))',
+          width: 'clamp(80px, 17vw, 130px)',
+          zIndex: 28,
+        }}
+      >
+        <style>{`
+          @media (max-width: 768px) {
+            .mobile-esc-key {
+              left: 10px !important;
+              top: 100px !important;
+              transform: none !important;
+              width: 55px !important;
+            }
+          }
+        `}</style>
+        <div style={{ transform: 'rotate(-5deg)' }}>
+          <img
+            src={escKeySrc}
+            alt=""
+            className="w-full"
+            loading="lazy"
+            draggable={false}
+          />
+          {/* Key shadow */}
+          <div
+            className="absolute inset-0"
+            style={{
+              opacity: 0.18,
+              boxShadow: '2px 3px 8px rgba(0,0,0,0.35)',
+              zIndex: -1,
+            }}
+            aria-hidden="true"
+          />
+        </div>
       </div>
 
       <div
@@ -159,6 +203,46 @@ export function GoaWindow({ mode }: GoaWindowProps) {
         {/* The window frame itself - allows clicks through to aperture */}
         <div style={{ pointerEvents: 'none' }}>
           <SceneImage asset={windowFrame} width="100%" priority still />
+        </div>
+
+        {/* Red Flower - LEFT side of window frame, moved down */}
+        <div
+          className="absolute mobile-red-flower"
+          style={{
+            left: '15%',
+            top: '42%',
+            width: '7%',
+            zIndex: 31,
+          }}
+        >
+          <style>{`
+            @media (max-width: 768px) {
+              .mobile-red-flower {
+                left: 14% !important;
+                top: 40% !important;
+                width: 8% !important;
+              }
+            }
+          `}</style>
+          <div style={{ transform: 'rotate(-8deg)' }}>
+            <img
+              src={redFlowerSrc}
+              alt=""
+              className="w-full"
+              loading="lazy"
+              draggable={false}
+            />
+            {/* Flower shadow */}
+            <div
+              className="absolute inset-0"
+              style={{
+                opacity: 0.15,
+                boxShadow: '1px 2px 5px rgba(0,0,0,0.30)',
+                zIndex: -1,
+              }}
+              aria-hidden="true"
+            />
+          </div>
         </div>
 
         {/* Lighthouse Poster - ON window frame (upper right) */}

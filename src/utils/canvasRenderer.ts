@@ -34,8 +34,9 @@ async function loadAssetImage(src: string): Promise<HTMLImageElement> {
 
 /**
  * Generate unique Builder ID
+ * EXPORTED so it can be generated immediately on button click
  */
-function generateBuilderId(): string {
+export function generateBuilderId(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
   let id = ''
   for (let i = 0; i < 6; i++) {
@@ -51,9 +52,12 @@ function generateBuilderId(): string {
  * 
  * CRITICAL: All coordinates are measured from the actual template image
  * Template dimensions: Inspect builder-pass-template.png for exact values
+ * 
+ * @param builderId - Pre-generated Builder ID (generated immediately on button click)
  */
 export async function renderBuilderPass(
   data: BuilderPassData,
+  builderId: string,
   _logoSrc?: string
 ): Promise<HTMLCanvasElement> {
   // Load the finalized template FIRST
@@ -206,8 +210,7 @@ export async function renderBuilderPass(
   
   ctx.fillText(data.stack, roleArea.x, roleArea.y)
   
-  // LAYER 5: Draw Builder ID
-  const builderId = generateBuilderId()
+  // LAYER 5: Draw Builder ID (pre-generated, passed as parameter)
   ctx.fillStyle = '#1a3a2e'
   ctx.font = `600 ${width * 0.025}px "Work Sans", sans-serif`
   ctx.textAlign = 'left'
