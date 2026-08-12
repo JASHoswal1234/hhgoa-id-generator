@@ -2,10 +2,12 @@
  * Canvas Renderer for Builder Pass and Builder Identity
  * 
  * Generates high-quality PNG images client-side
+ * 
+ * DYNAMIC FRAME SYSTEM: Photo frame adapts to uploaded photo's aspect ratio
  */
 
 import { getPhotoCropDimensions } from './imageProcessing'
-import builderPassTemplateSrc from '../assets/generator/builder-pass-template.png'
+import builderPassTemplateSrc from '../assets/generator/builder-pass-template-trial.png'
 
 export interface BuilderPassData {
   photo: HTMLImageElement
@@ -20,6 +22,41 @@ export interface BuilderIdentityData {
 }
 
 /**
+ * Polyfill for roundRect (not available in all browsers)
+ */
+function drawRoundRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number
+) {
+  if (typeof ctx.roundRect === 'function') {
+    ctx.roundRect(x, y, width, height, radius)
+  } else {
+    // Fallback for browsers without roundRect support
+    ctx.moveTo(x + radius, y)
+    ctx.lineTo(x + width - radius, y)
+    ctx.arcTo(x + width, y, x + width, y + radius, radius)
+    ctx.lineTo(x + width, y + height - radius)
+    ctx.arcTo(x + width, y + height, x + width - radius, y + height, radius)
+    ctx.lineTo(x + radius, y + height)
+    ctx.arcTo(x, y + height, x, y + height - radius, radius)
+    ctx.lineTo(x, y + radius)
+    ctx.arcTo(x, y, x + radius, y, radius)
+    ctx.closePath()
+  }
+}
+
+/**
+ * Template cache for performance optimization
+ * Prevents reloading the template image on every generation
+ */
+let cachedTemplate: HTMLImageElement | null = null
+let templateLoadingPromise: Promise<HTMLImageElement> | null = null
+
+/**
  * Wait for all images to load
  */
 async function loadAssetImage(src: string): Promise<HTMLImageElement> {
@@ -30,6 +67,33 @@ async function loadAssetImage(src: string): Promise<HTMLImageElement> {
     img.onerror = () => reject(new Error(`Failed to load: ${src}`))
     img.src = src
   })
+}
+
+/**
+ * Load and cache the Builder Pass template
+ * Uses singleton pattern to ensure only one load operation at a time
+ */
+async function loadTemplate(): Promise<HTMLImageElement> {
+  // Return cached template if available
+  if (cachedTemplate) {
+    return cachedTemplate
+  }
+  
+  // If already loading, return the existing promise
+  if (templateLoadingPromise) {
+    return templateLoadingPromise
+  }
+  
+  // Start loading and cache the promise
+  templateLoadingPromise = loadAssetImage(builderPassTemplateSrc)
+  
+  try {
+    cachedTemplate = await templateLoadingPromise
+    return cachedTemplate
+  } finally {
+    // Clear the loading promise once resolved or rejected
+    templateLoadingPromise = null
+  }
 }
 
 /**
@@ -60,8 +124,8 @@ export async function renderBuilderPass(
   builderId: string,
   _logoSrc?: string
 ): Promise<HTMLCanvasElement> {
-  // Load the finalized template FIRST
-  const template = await loadAssetImage(builderPassTemplateSrc)
+  // Load the finalized template FIRST (uses cache for speed)
+  const template = await loadTemplate()
   
   // Use template's NATIVE dimensions - no scaling
   const width = template.naturalWidth || template.width
@@ -87,15 +151,63 @@ export async function renderBuilderPass(
   // MEASURED COORDINATES from the actual template
   // Template dimensions: 1122px × 1402px
   
-  // Photo area - INNER bounds only (excluding the frame border/shadow)
-  // The yellow shadow/frame is part of the template - photo goes INSIDE
-  // Using exact pixel measurements from template inspection
-  const photoArea = {
-  x: width * 0.352,
-  y: height * 0.252,
-  width: width * 0.29,
-  height: height * 0.30,
-}
+  // Photo area container - the blank space where we'll draw dynamic frame + photo
+  // This defines the MAXIMUM bounds for the photo area
+  const photoContainer = {
+    x: width * 0.20,       // Left edge - moved more inward (was 0.15)
+    y: height * 0.26,      // Top edge - clears title
+    width: width * 0.60,   // Maximum width - reduced (was 0.70)
+    height: height * 0.28, // Maximum height - reduced (was 0.32)
+  }
+  
+  // Calculate dynamic frame dimensions based on photo aspect ratio
+  const photoAspect = data.photo.width / data.photo.height
+  
+  let frameWidth, frameHeight
+  
+  // Determine frame size - adapt to photo while staying within container
+  if (photoAspect >= 1.2) {
+    // Landscape photo (wider) - use full width, calculate height
+    frameWidth = photoContainer.width
+    frameHeight = frameWidth / photoAspect
+    
+    // If too tall, constrain by height instead
+    if (frameHeight > photoContainer.height) {
+      frameHeight = photoContainer.height
+      frameWidth = frameHeight * photoAspect
+    }
+  } else if (photoAspect <= 0.8) {
+    // Portrait photo (taller) - favor height, calculate width
+    frameHeight = photoContainer.height
+    frameWidth = frameHeight * photoAspect
+    
+    // If too narrow, increase size while maintaining aspect
+    const minWidth = photoContainer.width * 0.50
+    if (frameWidth < minWidth) {
+      frameWidth = minWidth
+      frameHeight = frameWidth / photoAspect
+      // Re-constrain if needed
+      if (frameHeight > photoContainer.height) {
+        frameHeight = photoContainer.height
+        frameWidth = frameHeight * photoAspect
+      }
+    }
+  } else {
+    // Square-ish photo (0.8 to 1.2 ratio) - use balanced approach
+    const targetSize = Math.min(photoContainer.width * 0.85, photoContainer.height)
+    frameHeight = targetSize
+    frameWidth = frameHeight * photoAspect
+    
+    // Ensure it fits
+    if (frameWidth > photoContainer.width) {
+      frameWidth = photoContainer.width
+      frameHeight = frameWidth / photoAspect
+    }
+  }
+  
+  // Center the frame within the container
+  const frameX = photoContainer.x + (photoContainer.width - frameWidth) / 2
+  const frameY = photoContainer.y + (photoContainer.height - frameHeight) / 2
   
   // Name area - ON the first horizontal line
   const nameArea = {
@@ -115,25 +227,47 @@ export async function renderBuilderPass(
     y: height * 0.860       // 86% - above barcode, below label
   }
   
-  // LAYER 2: Draw user photo ONLY inside photo area with clipping
-  // Use TRUE object-cover behavior - scale to fill, crop excess
+  // LAYER 2: Draw dynamic frame with thin black border + yellow bottom accent
+  const frameBorderWidth = width * 0.004  // Thin frame border (was 0.010)
+  const frameRadius = width * 0.012
+  const yellowAccentHeight = width * 0.006  // Yellow accent strip on bottom
+  
+  // Draw main black frame border
+  ctx.save()
+  ctx.strokeStyle = '#1a3a2e'  // Dark green/black
+  ctx.lineWidth = frameBorderWidth
+  ctx.beginPath()
+  drawRoundRect(ctx, frameX, frameY, frameWidth, frameHeight, frameRadius)
+  ctx.stroke()
+  ctx.restore()
+  
+  // Draw yellow accent on bottom edge only
+  ctx.save()
+  ctx.fillStyle = '#FEE101'  // Bright yellow
+  
+  // Bottom edge rectangle (inset slightly from corners to avoid rounded corner area)
+  const accentX = frameX + frameRadius
+  const accentY = frameY + frameHeight - yellowAccentHeight - frameBorderWidth / 2
+  const accentWidth = frameWidth - (frameRadius * 2)
+  
+  ctx.fillRect(accentX, accentY, accentWidth, yellowAccentHeight)
+  ctx.restore()
+  
+  // Photo area - INNER bounds (inside the frame border)
+  const photoArea = {
+    x: frameX + frameBorderWidth,
+    y: frameY + frameBorderWidth,
+    width: frameWidth - (frameBorderWidth * 2),
+    height: frameHeight - (frameBorderWidth * 2),
+  }
+  
+  // LAYER 3: Draw user photo ONLY inside photo area with clipping
+  // Photo fills the frame completely (no object-cover needed, frame matches photo aspect)
   const zoom = data.zoom || 1
   
-  // Calculate dimensions to FILL the frame completely (object-cover)
-  const photoAspect = data.photo.width / data.photo.height
-  const frameAspect = photoArea.width / photoArea.height
-  
-  let renderWidth, renderHeight
-  
-  if (photoAspect > frameAspect) {
-    // Photo is wider than frame - fit to HEIGHT, crop width
-    renderHeight = photoArea.height * zoom
-    renderWidth = renderHeight * photoAspect
-  } else {
-    // Photo is taller than frame - fit to WIDTH, crop height
-    renderWidth = photoArea.width * zoom
-    renderHeight = renderWidth / photoAspect
-  }
+  // Photo fills frame exactly - frame is already sized to photo aspect
+  const renderWidth = photoArea.width * zoom
+  const renderHeight = photoArea.height * zoom
   
   // Center the photo in the frame
   const renderX = photoArea.x + (photoArea.width - renderWidth) / 2
@@ -143,23 +277,9 @@ export async function renderBuilderPass(
   ctx.save()
   ctx.beginPath()
   
-  // Create rounded rectangle clipping path
-  const radius = width * 0.012
-  const px = photoArea.x
-  const py = photoArea.y
-  const pw = photoArea.width
-  const ph = photoArea.height
-  
-  ctx.moveTo(px + radius, py)
-  ctx.lineTo(px + pw - radius, py)
-  ctx.arcTo(px + pw, py, px + pw, py + radius, radius)
-  ctx.lineTo(px + pw, py + ph - radius)
-  ctx.arcTo(px + pw, py + ph, px + pw - radius, py + ph, radius)
-  ctx.lineTo(px + radius, py + ph)
-  ctx.arcTo(px, py + ph, px, py + ph - radius, radius)
-  ctx.lineTo(px, py + radius)
-  ctx.arcTo(px, py, px + radius, py, radius)
-  ctx.closePath()
+  // Create rounded rectangle clipping path for photo area
+  const photoRadius = width * 0.010
+  drawRoundRect(ctx, photoArea.x, photoArea.y, photoArea.width, photoArea.height, photoRadius)
   ctx.clip()
   
   // Draw the photo - it will be clipped to the frame
@@ -173,7 +293,7 @@ export async function renderBuilderPass(
   
   ctx.restore()
   
-  // LAYER 3: Draw name
+  // LAYER 4: Draw name
   ctx.fillStyle = '#1a3a2e'
   ctx.font = `700 ${width * 0.045}px "Fraunces", serif`
   ctx.textAlign = 'center'
@@ -192,7 +312,7 @@ export async function renderBuilderPass(
   
   ctx.fillText(data.name.toUpperCase(), nameArea.x, nameArea.y)
   
-  // LAYER 4: Draw role
+  // LAYER 5: Draw role
   ctx.fillStyle = '#40584d'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
@@ -210,7 +330,7 @@ export async function renderBuilderPass(
   
   ctx.fillText(data.stack, roleArea.x, roleArea.y)
   
-  // LAYER 5: Draw Builder ID (pre-generated, passed as parameter)
+  // LAYER 6: Draw Builder ID (pre-generated, passed as parameter)
   ctx.fillStyle = '#1a3a2e'
   ctx.font = `600 ${width * 0.025}px "Work Sans", sans-serif`
   ctx.textAlign = 'left'

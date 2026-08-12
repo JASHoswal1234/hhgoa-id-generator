@@ -120,8 +120,6 @@ export function GoaEnvironment() {
           src={studio247Src}
           alt="2:47 PM Studio"
           className="w-full"
-          loading="eager"
-          fetchPriority="high"
           draggable={false}
         />
       </div>
@@ -150,8 +148,6 @@ export function GoaEnvironment() {
             src={hackerHouseGoaSrc}
             alt="Hacker House Goa"
             className="w-full"
-            loading="eager"
-            fetchPriority="high"
             draggable={false}
           />
           
@@ -170,8 +166,6 @@ export function GoaEnvironment() {
               src={goaHindiSrc}
               alt=""
               className="w-full"
-              loading="eager"
-              fetchPriority="high"
               draggable={false}
             />
           </div>

@@ -68,8 +68,11 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError, 
       // Create File from Blob
       const file = new File([blob], 'hh-goa-builder-pass.png', { type: 'image/png' })
 
-      // Try native Web Share API (primarily for mobile)
-      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+      // Only use Web Share API on mobile (viewport width <= 768px)
+      const isMobile = window.innerWidth <= 768
+      
+      // Try native Web Share API (mobile only)
+      if (isMobile && navigator.share && navigator.canShare?.({ files: [file] })) {
         try {
           await navigator.share({
             files: [file],
