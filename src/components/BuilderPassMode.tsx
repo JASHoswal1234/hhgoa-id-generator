@@ -51,31 +51,60 @@ export function BuilderPassMode({ onGeneratedCanvas, onActionHandlers, onError, 
   const handleShareToX = async () => {
     if (!generatedCanvas) return
 
+    const shareText = 'I just created my HH Goa Builder Pass.\n\n#FrameInGoa'
+    
     try {
-      // First, automatically download the image
+      // Convert canvas to Blob
+      const blob = await new Promise<Blob | null>((resolve) => {
+        generatedCanvas.toBlob(resolve, 'image/png')
+      })
+
+      if (!blob) {
+        throw new Error('Failed to create Builder Pass image')
+      }
+
+      // Create File from Blob
+      const file = new File([blob], 'hh-goa-builder-pass.png', { type: 'image/png' })
+
+      // Try native Web Share API (primarily for mobile)
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'My HH Goa Builder Pass',
+            text: shareText,
+          })
+          // User completed share or cancelled - both are success cases
+          return
+        } catch (shareErr: any) {
+          // User cancelled share sheet - this is normal, don't show error
+          if (shareErr.name === 'AbortError') {
+            return
+          }
+          // Other share errors - fall through to fallback
+          console.warn('Native share failed, using fallback:', shareErr)
+        }
+      }
+
+      // Fallback: Download + open X (desktop or unsupported browsers)
       await downloadCanvas(generatedCanvas, 'hh-goa-builder-pass.png')
       
       // Small delay to ensure download starts
       await new Promise(resolve => setTimeout(resolve, 300))
       
-      // Then open X with pre-filled text
-      const text = encodeURIComponent(
+      // Open X with pre-filled text
+      const xText = encodeURIComponent(
         'Made it to Goa. Built something worth staying for.\n\n' +
         'Just got my official Builder Pass! 🏖️\n\n' +
         'Create yours: https://hhgoa-id-generator-psi.vercel.app\n\n' +
         '#FrameInGoa #BuilderLife #GoaVibes'
       )
-      window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank', 'noopener,noreferrer')
+      window.open(`https://twitter.com/intent/tweet?text=${xText}`, '_blank', 'noopener,noreferrer')
     } catch (err) {
       console.error('Share error:', err)
-      // Fallback to just opening X
-      const text = encodeURIComponent(
-        'Made it to Goa. Built something worth staying for.\n\n' +
-        'Just got my official Builder Pass! 🏖️\n\n' +
-        'Create yours: https://hhgoa-id-generator-psi.vercel.app\n\n' +
-        '#FrameInGoa #BuilderLife #GoaVibes'
-      )
-      window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank', 'noopener,noreferrer')
+      const errorMsg = 'Failed to share. Please try again.'
+      setError(errorMsg)
+      onError?.(errorMsg)
     }
   }
 
